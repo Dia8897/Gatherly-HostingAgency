@@ -24,3 +24,10 @@ yarn-error.log*
 
 /backend/node_modules/
 
+# Node modules
+node_modules/
+
+# Babel cache
+node_modules/.cache/
+
+

@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ClientHero from "../components/ClientHero";
+import ClientSignInSection from "../components/ClientSignInSection";
+import ClientEventRequest from "../components/ClientEventRequest";
+import ClientEventList from "../components/ClientEventList";
 
 export default function ClientPage() {
   // SIGN-IN STATE
@@ -13,7 +17,7 @@ export default function ClientPage() {
   const [eventDate, setEventDate] = useState("");
   const [guests, setGuests] = useState("");
 
-  // RANDOM SAMPLE DATA + NEW REQUESTS
+  // EVENTS LIST STATE
   const [events, setEvents] = useState([
     {
       id: 1,
@@ -70,8 +74,10 @@ export default function ClientPage() {
       status: "Pending review",
     };
 
+    // add new event to the list
     setEvents((prev) => [...prev, newEvent]);
 
+    // clear form fields
     setEventDate("");
     setGuests("");
   };
@@ -80,150 +86,41 @@ export default function ClientPage() {
     <>
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold mb-2">Client Portal</h1>
-        <p className="text-gray-600 mb-8">
-          Sign in and request your event — we will handle the rest ✨
-        </p>
+      {/* Background + push under fixed navbar */}
+      <div className="bg-gray-100 min-h-screen pt-24 pb-10">
+        <main className="max-w-6xl mx-auto px-4">
+          {/* HERO */}
+          <ClientHero />
 
-        {/* GRID: Sign-In | Request Form */}
-        <div className="grid gap-8 lg:grid-cols-2">
-         
-          {/* SIGN-IN SECTION */}
-          <section className="border rounded-xl p-6 shadow-sm bg-white">
-            <h2 className="text-xl font-semibold mb-4">Sign in as Client</h2>
+                   {/* GRID: Sign-in (left) + event request (right) */}
+          <div className="grid gap-8 lg:grid-cols-2 mt-6">
+            <ClientSignInSection
+              clientName={clientName}
+              email={email}
+              isSignedIn={isSignedIn}
+              onNameChange={setClientName}
+              onEmailChange={setEmail}
+              onSignIn={handleSignIn}
+            />
 
-            <form className="space-y-4" onSubmit={handleSignIn}>
-              <div>
-                <label className="block text-sm font-medium mb-1">Full name</label>
-                <input
-                  type="text"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Nour Haddad"
-                />
-              </div>
+            <ClientEventRequest
+              eventType={eventType}
+              eventDate={eventDate}
+              guests={guests}
+              onTypeChange={setEventType}
+              onDateChange={setEventDate}
+              onGuestsChange={setGuests}
+              onSubmit={handleCreateRequest}
+            />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
-              </div>
+          {/* EVENTS LIST */}
+          <ClientEventList events={events} />
 
-              <button
-                type="submit"
-                className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-              >
-                {isSignedIn ? "Signed in ✔" : "Sign in"}
-              </button>
-
-              {isSignedIn && (
-                <p className="text-sm text-green-600 mt-2">
-                  Signed in as <span className="font-semibold">{clientName}</span>
-                </p>
-              )}
-            </form>
-          </section>
-
-          {/* EVENT REQUEST SECTION */}
-          <section className="border rounded-xl p-6 shadow-sm bg-white">
-            <h2 className="text-xl font-semibold mb-4">Request a New Event</h2>
-
-            <form className="space-y-4" onSubmit={handleCreateRequest}>
-              <div>
-                <label className="block text-sm font-medium mb-1">Event type</label>
-                <select
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={eventType}
-                  onChange={(e) => setEventType(e.target.value)}
-                >
-                  <option>Wedding</option>
-                  <option>Engagement</option>
-                  <option>Birthday Party</option>
-                  <option>Corporate Event</option>
-                  <option>Graduation</option>
-                  <option>Baby Shower</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Event date</label>
-                <input
-                  type="date"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={eventDate}
-                  onChange={(e) => setEventDate(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Guests</label>
-                <input
-                  type="number"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  min="1"
-                  placeholder="e.g. 120"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
-              >
-                Submit event request
-              </button>
-            </form>
-          </section>
-
-        </div>
-
-        {/* EVENT REQUEST LIST */}
-        <section className="mt-10">
-          <h2 className="text-xl font-semibold mb-4">Your Event Requests</h2>
-
-          {events.length === 0 ? (
-            <p className="text-gray-500">No requests yet.</p>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {events.map((ev) => (
-                <div
-                  key={ev.id}
-                  className="border rounded-lg p-4 shadow-sm bg-white"
-                >
-                  <h3 className="text-lg font-semibold mb-1">{ev.type}</h3>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Date: <span className="font-medium">{ev.date}</span>
-                  </p>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Guests: <span className="font-medium">{ev.guests}</span>
-                  </p>
-                  <p
-                    className={`inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full ${
-                      ev.status === "Confirmed"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {ev.status}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
+        </main>
+      </div>
 
       <Footer />
     </>
   );
 }
-
-
